@@ -49,4 +49,16 @@ df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
 #test = bg.building_type_to_num("Wo", df_MSRs)
 #print(test)
 # hi
-#st.dataframe(df_output)
+
+
+# st.dataframe(df_output)
+
+st.sidebar.header("Date Filter")
+
+df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024"])
+
+min_date = df_output["DATUM_TIJDSTIP_2024"].min()
+max_date = df_output["DATUM_TIJDSTIP_2024"].max()
+
+start_date = st.sidebar.date_input("Start date", min_date)
+end_date = st.sidebar.date_input("End date", max_date

@@ -44,21 +44,22 @@ class BackgroundCode:
         df_MSR_profile = pd.DataFrame()
         df_MSR_profile["DATUM_TIJDSTIP_2024"] = df_profiles["DATUM_TIJDSTIP_2024"].copy()
         df_MSR_profile["DATUM_TIJDSTIP_2023"] = df_profiles["DATUM_TIJDSTIP_2023"].copy()
-        df_MSR_profile["Woning [kW]"] = df_profiles["Woning_AZI"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Wo", df_MSRs)]
-        df_MSR_profile["Appartement [kW]"] = df_profiles["Appartement_AZI"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ap", df_MSRs)]
-        df_MSR_profile["Winkel [kW]"] = df_profiles["Winkelfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Wi", df_MSRs)]
-        df_MSR_profile["Onderwijs [kW]"] = df_profiles["Onderwijsfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("On", df_MSRs)]
-        df_MSR_profile["Kantoor [kW]"] = df_profiles["Kantoorfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ka", df_MSRs)]
-        df_MSR_profile["Gezondsheid [kW]"] = df_profiles["Gezondheidszorgfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ge", df_MSRs)]
-        df_MSR_profile["Industrie [kW]"] = df_profiles["Industriefunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("In", df_MSRs)]
-        df_MSR_profile["Overig [kW]"] = df_profiles["Overig"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ov", df_MSRs)]
-        df_MSR_profile["Logies [kW]"] = df_profiles["Logiesfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Lo", df_MSRs)]
-        df_MSR_profile["Bijenkomst [kW]"] = df_profiles["Bijeenkomstfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Bi", df_MSRs)]
-        df_MSR_profile["Sport [kW]"] = df_profiles["Sportfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Sp", df_MSRs)]
-        df_MSR_profile["Zonnepanelen [kW]"] = df_profiles["ZP normalised energy [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Zp", df_MSRs)]*0.88
-        df_MSR_profile["Oplaad punten [kW]"] = df_profiles["Charge point energy_normalised [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("CP", df_MSRs)]*12670
+        df_MSR_profile["Woning [kW]"] = df_profiles["Woning_AZI"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Wo", df_MSRs)]*4
+        df_MSR_profile["Appartement [kW]"] = df_profiles["Appartement_AZI"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ap", df_MSRs)]*4
+        df_MSR_profile["Winkel [kW]"] = df_profiles["Winkelfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Wi", df_MSRs)]*4
+        df_MSR_profile["Onderwijs [kW]"] = df_profiles["Onderwijsfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("On", df_MSRs)]*4
+        df_MSR_profile["Kantoor [kW]"] = df_profiles["Kantoorfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ka", df_MSRs)]*4
+        df_MSR_profile["Gezondsheid [kW]"] = df_profiles["Gezondheidszorgfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ge", df_MSRs)]*4
+        df_MSR_profile["Industrie [kW]"] = df_profiles["Industriefunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("In", df_MSRs)]*4
+        df_MSR_profile["Overig [kW]"] = df_profiles["Overig"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Ov", df_MSRs)]*4
+        df_MSR_profile["Logies [kW]"] = df_profiles["Logiesfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Lo", df_MSRs)]*4
+        df_MSR_profile["Bijenkomst [kW]"] = df_profiles["Bijeenkomstfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Bi", df_MSRs)]*4
+        df_MSR_profile["Sport [kW]"] = df_profiles["Sportfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Sp", df_MSRs)]*4
+        df_MSR_profile["Zonnepanelen [kW]"] = df_profiles["ZP normalised energy [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Zp", df_MSRs)]*0.88*4
+        df_MSR_profile["Oplaad punten [kW]"] = df_profiles["Charge point energy_normalised [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("CP", df_MSRs)]*12670*4
         
-        
+        df_MSR_profile["Woningen totaal [kW]"] = df_MSR_profile["Woning [kW]"] + df_MSR_profile["Appartement [kW]"]
+        df_MSR_profile["Utiliteit totaal [kW]"] = df_MSR_profile["Winkel [kW]"] + df_MSR_profile["Onderwijs [kW]"] + df_MSR_profile["Kantoor [kW]"] + df_MSR_profile["Gezondsheid [kW]"] + df_MSR_profile["Industrie [kW]"] + df_MSR_profile["Overig [kW]"] + df_MSR_profile["Logies [kW]"] + df_MSR_profile["Bijenkomst [kW]"] + df_MSR_profile["Sport [kW]"]
         return df_MSR_profile
     
     def building_type_to_num(self, letter, df_MSRs):
@@ -109,6 +110,9 @@ class BackgroundCode:
         # Return the first matching row index
         return matches[0]
 
+    def plot_df(self, start_date, end_date, df, cols=["Woningen totaal [kW]", "Utiliteit totaal [kW]"]):
+        df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
+        return 0
 
 if __name__ == "__main__":
     main()
