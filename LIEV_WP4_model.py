@@ -46,6 +46,7 @@ if "df_MSRs" not in st.session_state:
 df_MSRs = st.session_state.df_MSRs
 
 df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
-
+#test = bg.building_type_to_num("Wo", df_MSRs)
+#print(test)
 # hi
-st.dataframe(df_output)
+#st.dataframe(df_output)
