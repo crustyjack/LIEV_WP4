@@ -54,15 +54,15 @@ df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
 
 # st.dataframe(df_output)
 
-st.sidebar.header("Date Filter")
+#st.sidebar.header("Date Filter")
 
 df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024"], dayfirst=True)
 
 min_date = df_output["DATUM_TIJDSTIP_2024"].min().date()
 max_date = df_output["DATUM_TIJDSTIP_2024"].max().date()
 
-start_date = st.sidebar.date_input("Start date", min_date)
-end_date = st.sidebar.date_input("End date", max_date)
+#start_date = st.sidebar.date_input("Start date", min_date)
+#end_date = st.sidebar.date_input("End date", max_date)
 
 #print("test")
 
