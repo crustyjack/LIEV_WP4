@@ -58,8 +58,20 @@ st.sidebar.header("Date Filter")
 
 df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024"], dayfirst=True)
 
-min_date = df_output["DATUM_TIJDSTIP_2024"].min()
-max_date = df_output["DATUM_TIJDSTIP_2024"].max()
+min_date = df_output["DATUM_TIJDSTIP_2024"].min().date()
+max_date = df_output["DATUM_TIJDSTIP_2024"].max().date()
 
 start_date = st.sidebar.date_input("Start date", min_date)
 end_date = st.sidebar.date_input("End date", max_date)
+
+#print("test")
+
+start_date, end_date = st.slider(
+    "Select date range",
+    min_value=min_date,
+    max_value=max_date,
+    value=(min_date, max_date),
+    format="YYYY-MM-DD",
+)
+
+plot = bg.plot_df(start_date, end_date, df_output)

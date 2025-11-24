@@ -110,9 +110,15 @@ class BackgroundCode:
         # Return the first matching row index
         return matches[0]
 
-    def plot_df(self, start_date, end_date, df, cols=["Woningen totaal [kW]", "Utiliteit totaal [kW]"]):
+    def plot_df(self, start_date, end_date, df, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]"]):
         df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
-        return 0
+        mask = (df["DATUM_TIJDSTIP_2024"] >= pd.to_datetime(start_date)) & (df["DATUM_TIJDSTIP_2024"] <= pd.to_datetime(end_date))
+        df_slice = df.loc[mask]
+
+        # st.write("Filtered DataFrame", df_slice)
+
+        # ---- PLOT ----
+        st.line_chart(df_slice.set_index("DATUM_TIJDSTIP_2024")[cols_to_plot])
 
 if __name__ == "__main__":
     main()
