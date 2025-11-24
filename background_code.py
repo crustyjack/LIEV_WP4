@@ -46,3 +46,7 @@ class BackgroundCode:
         df_MSR_profile["DATUM_TIJDSTIP_2023"] = df_profiles["DATUM_TIJDSTIP_2023"].copy()
         df_MSR_profile["Woning [kW]"] = df_profiles["Woning_AZI"].copy()*df_MSRs[MSR_name]
         return df_MSR_profile
+    
+
+if __name__ == "__main__":
+    main()
