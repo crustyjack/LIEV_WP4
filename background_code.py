@@ -5,9 +5,11 @@ import gspread
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 from google.oauth2.service_account import Credentials
+from datetime import timedelta
 
 class BackgroundCode:
 
@@ -110,16 +112,27 @@ class BackgroundCode:
 
         # Return the first matching row index
         return matches[0]
+    
+    def _add_sudo_year(self, df, year):
+        df[f"Pseudo year {year}"] = df["DATUM_TIJDSTIP_2024"].copy()
+        first_day_24 = df["DATUM_TIJDSTIP_2024"].min().date().isoweekday()
+        first_day_yr = pd.to_datetime(f"{year}-01-01").date().isoweekday()
+        day_difference = first_day_yr - first_day_24
+        if day_difference >= 4:
+            df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=-day_difference*96)
+        else:
+            df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=day_difference*96)
+        return df
 
-    def plot_df(self, start_date, end_date, df, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]"]):
+    def plot_df(self, start_date, end_date, df, year, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]"]):
         df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
-        mask = (df["DATUM_TIJDSTIP_2024"] >= pd.to_datetime(start_date)) & (df["DATUM_TIJDSTIP_2024"] <= pd.to_datetime(end_date))
+        mask = (df[f"DATE_{year}"] >= pd.to_datetime(start_date)) & (df[f"DATE_{year}"] <= pd.to_datetime(end_date))
         df_slice = df.loc[mask]
 
         # st.write("Filtered DataFrame", df_slice)
 
         # ---- PLOT ----
-        st.session_state["df_plot_data"] = df_slice.set_index("DATUM_TIJDSTIP_2024")[cols_to_plot]
+        st.session_state["df_plot_data"] = df_slice.set_index(f"DATE_{year}")[cols_to_plot]
 
         #return plot
     
@@ -128,6 +141,30 @@ class BackgroundCode:
         mask = (df["DATUM_TIJDSTIP_2024"] >= pd.to_datetime(start_date)) & (df["DATUM_TIJDSTIP_2024"] <= pd.to_datetime(end_date))
 
         return mask
+    
+    def _map_2024_to_year(self, df, target_year, date_col="DATUM_TIJDSTIP_2024"):
+        """
+        Takes 2024 timestamps and maps them into another year
+        while preserving weekday alignment.
+        """
+        if df[date_col].dt.year.nunique() != 1 or df[date_col].dt.year.iloc[0] != 2024:
+            raise ValueError("Input column must contain only dates from 2024")
+
+        # Start with no shift
+        shift_weeks = 0
+
+        # Find the smallest number of weeks forward such that year == target_year
+        while True:
+            shifted = df[date_col] + timedelta(weeks=shift_weeks)
+            if shifted.dt.year.iloc[0] == target_year:
+                break
+            shift_weeks += 1  # try next 7-day shift
+
+        # Create the new column
+        df[f"DATE_{target_year}"] = shifted
+        df[f"DATE_{target_year}"] = pd.to_datetime(df[f"DATE_{target_year}"])
+
+        return df
 
 if __name__ == "__main__":
     main()

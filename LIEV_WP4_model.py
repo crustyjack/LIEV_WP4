@@ -49,6 +49,8 @@ if "df_MSRs" not in st.session_state:
 df_MSRs = st.session_state.df_MSRs
 
 df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
+df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024"], dayfirst=True)
+df_output = bg._map_2024_to_year(df_output, year)
 #test = bg.building_type_to_num("Wo", df_MSRs)
 #print(test)
 # hi
@@ -58,22 +60,32 @@ df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
 
 #st.sidebar.header("Date Filter")
 
-df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024"], dayfirst=True)
 
-min_date = df_output["DATUM_TIJDSTIP_2024"].min().date()
-max_date = df_output["DATUM_TIJDSTIP_2024"].max().date()
+
+min_date = df_output[f"DATE_{year}"].min().date()
+max_date = df_output[f"DATE_{year}"].max().date()
 
 default_start = datetime.now()
 default_end = datetime.now() + timedelta(days=1)
 
-start_date = st.date_input("Start date", default_start)
-end_date = st.date_input("End date", default_end)
+start_date = st.date_input("Start date", min_date, min_value=min_date, max_value=max_date)
+end_date = st.date_input("End date", start_date, min_value=start_date, max_value=max_date)
 
 plot_placeholder = st.empty()   # chart will appear BELOW this
 
-if st.button("Create plot"):
-    bg.plot_df(start_date, end_date, df_output)
+# ---- INIT SESSION STATE ----
+if "df_plot_data" not in st.session_state:
+    st.session_state["df_plot_data"] = None
 
-# chart displays on rerun, below the button
-if "df_plot_data" in st.session_state:
+# ---- BUTTON ----
+if st.button("Update plot"):
+    bg.plot_df(start_date, end_date, df_output, year)
+
+# ---- SHOW PLOT (if exists) ----
+if st.session_state["df_plot_data"] is not None:
     plot_placeholder.line_chart(st.session_state["df_plot_data"])
+else:
+    st.write("No plot generated yet.")
+
+# ---- DEBUG ----
+#st.write(st.session_state["df_plot_data"])
