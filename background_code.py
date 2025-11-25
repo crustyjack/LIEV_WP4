@@ -5,6 +5,7 @@ import gspread
 
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from google.oauth2.service_account import Credentials
 
@@ -118,7 +119,15 @@ class BackgroundCode:
         # st.write("Filtered DataFrame", df_slice)
 
         # ---- PLOT ----
-        st.line_chart(df_slice.set_index("DATUM_TIJDSTIP_2024")[cols_to_plot])
+        st.session_state["df_plot_data"] = df_slice.set_index("DATUM_TIJDSTIP_2024")[cols_to_plot]
+
+        #return plot
+    
+    def _mask_maker(self, start_date, end_date, df):
+        df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
+        mask = (df["DATUM_TIJDSTIP_2024"] >= pd.to_datetime(start_date)) & (df["DATUM_TIJDSTIP_2024"] <= pd.to_datetime(end_date))
+
+        return mask
 
 if __name__ == "__main__":
     main()

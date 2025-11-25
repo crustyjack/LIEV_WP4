@@ -2,11 +2,13 @@
 
 import background_code
 import gspread
+import matplotlib
 
 import streamlit as st
 import pandas as pd
 
 from google.oauth2.service_account import Credentials
+from datetime import timedelta, datetime
 
 bg = background_code.BackgroundCode()
 
@@ -61,17 +63,17 @@ df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024
 min_date = df_output["DATUM_TIJDSTIP_2024"].min().date()
 max_date = df_output["DATUM_TIJDSTIP_2024"].max().date()
 
-#start_date = st.sidebar.date_input("Start date", min_date)
-#end_date = st.sidebar.date_input("End date", max_date)
+default_start = datetime.now()
+default_end = datetime.now() + timedelta(days=1)
 
-#print("test")
+start_date = st.date_input("Start date", default_start)
+end_date = st.date_input("End date", default_end)
 
-start_date, end_date = st.slider(
-    "Select date range",
-    min_value=min_date,
-    max_value=max_date,
-    value=(min_date, max_date),
-    format="YYYY-MM-DD",
-)
+plot_placeholder = st.empty()   # chart will appear BELOW this
 
-plot = bg.plot_df(start_date, end_date, df_output)
+if st.button("Create plot"):
+    bg.plot_df(start_date, end_date, df_output)
+
+# chart displays on rerun, below the button
+if "df_plot_data" in st.session_state:
+    plot_placeholder.line_chart(st.session_state["df_plot_data"])
