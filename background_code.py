@@ -58,11 +58,12 @@ class BackgroundCode:
         df_MSR_profile["Logies [kW]"] = df_profiles["Logiesfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Lo", df_MSRs)]*4
         df_MSR_profile["Bijenkomst [kW]"] = df_profiles["Bijeenkomstfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Bi", df_MSRs)]*4
         df_MSR_profile["Sport [kW]"] = df_profiles["Sportfunctie"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Sp", df_MSRs)]*4
-        df_MSR_profile["Zonnepanelen [kW]"] = df_profiles["ZP normalised energy [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Zp", df_MSRs)]*0.88*4
-        df_MSR_profile["Oplaad punten [kW]"] = df_profiles["Charge point energy_normalised [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("CP", df_MSRs)]*12670*4
-        
+        df_MSR_profile["Zonnepanelen [kW]"] = -df_profiles["ZP normalised energy [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("Zp", df_MSRs)]*0.88*4
+        df_MSR_profile["Oplaad punten [kW]"] = df_profiles["Charge point energy_normalised [kWh/kWh]"].copy()*df_MSRs[MSR_name][self.building_type_to_num("CP", df_MSRs)]*12670*4 # 12670 is the average yearly usage per charging point
+                
         df_MSR_profile["Woningen totaal [kW]"] = df_MSR_profile["Woning [kW]"] + df_MSR_profile["Appartement [kW]"]
         df_MSR_profile["Utiliteit totaal [kW]"] = df_MSR_profile["Winkel [kW]"] + df_MSR_profile["Onderwijs [kW]"] + df_MSR_profile["Kantoor [kW]"] + df_MSR_profile["Gezondsheid [kW]"] + df_MSR_profile["Industrie [kW]"] + df_MSR_profile["Overig [kW]"] + df_MSR_profile["Logies [kW]"] + df_MSR_profile["Bijenkomst [kW]"] + df_MSR_profile["Sport [kW]"]
+        df_MSR_profile["MSR totaal [kW]"] = df_MSR_profile["Zonnepanelen [kW]"] + df_MSR_profile["Oplaad punten [kW]"] + df_MSR_profile["Woningen totaal [kW]"] + df_MSR_profile["Utiliteit totaal [kW]"]
         return df_MSR_profile
     
     def building_type_to_num(self, letter, df_MSRs):
@@ -124,7 +125,7 @@ class BackgroundCode:
             df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=day_difference*96)
         return df
 
-    def plot_df(self, start_date, end_date, df, year, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]"]):
+    def plot_df(self, start_date, end_date, df, year, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]", "Zonnepanelen [kW]", "Oplaad punten [kW]", "MSR totaal [kW]"]):
         df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
         mask = (df[f"DATE_{year}"] >= pd.to_datetime(start_date)) & (df[f"DATE_{year}"] <= pd.to_datetime(end_date))
         df_slice = df.loc[mask]
@@ -165,6 +166,51 @@ class BackgroundCode:
         df[f"DATE_{target_year}"] = pd.to_datetime(df[f"DATE_{target_year}"])
 
         return df
+    
+    def plot_df_with_dashed_lines(self, df, dashed_series, placeholder):
+        if df is None or df.empty:
+            placeholder.write("No data to plot.")
+            return
+
+        # Reset index safely
+        df_reset = df.reset_index()
+
+        # Identify the index column (the column added by reset_index)
+        index_col = df_reset.columns[0]
+
+        # Ensure datetime index is treated correctly
+        df_reset[index_col] = pd.to_datetime(df_reset[index_col], errors="ignore")
+
+        # Convert to long format
+        df_long = df_reset.melt(
+            id_vars=index_col,
+            var_name="series",
+            value_name="value"
+        )
+
+        # Build chart
+        chart = (
+            alt.Chart(df_long)
+            .mark_line()
+            .encode(
+                x=index_col + ":T",   # Temporal axis (date/time)
+                y="value:Q",
+                color="series:N",
+                strokeDash=alt.condition(
+                    alt.FieldOneOfPredicate(field="series", oneOf=dashed_series),
+                    alt.value([4, 4]),       # dashed style
+                    alt.value([1, 0])        # solid style
+                ),
+                strokeWidth=alt.condition(
+                    alt.FieldOneOfPredicate(field="series", oneOf=dashed_series),
+                    alt.value(1),            # thinner dashed lines
+                    alt.value(2.5)           # thicker solid lines
+                )
+            )
+        )
+
+        # Render chart
+        placeholder.altair_chart(chart, use_container_width=True)
 
 if __name__ == "__main__":
     main()
