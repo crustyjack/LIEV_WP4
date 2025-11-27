@@ -96,7 +96,8 @@ else:
 
 
 # --- TESTING ---
-
+# The following works - it jsut has to be run through the function bg.plot_df_with_dashed_lines(df, dashed_series, placeholder)
+"""
 df = st.session_state["df_plot_data"]
 
 # Reset index safely
@@ -138,3 +139,4 @@ chart = (
 )
 
 plot_placeholder.altair_chart(chart, use_container_width=True)
+"""
