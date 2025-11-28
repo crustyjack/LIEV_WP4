@@ -27,6 +27,11 @@ MSR_name = st.selectbox(
 
 year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
 
+if st.button("Change date to largest draw through MSR"):
+    None
+
+if st.button("Change date to least (or most negative) draw through MSR"):
+    None
 #st.write("You are modelling ", MSR_name, " MSR", "with an fully electric home adoption rate of ", Accom_elect_perc, "%, in the year ", year, ".")
 
 
