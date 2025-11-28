@@ -7,6 +7,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import altair as alt
 
 from google.oauth2.service_account import Credentials
 from datetime import timedelta
@@ -167,7 +168,17 @@ class BackgroundCode:
 
         return df
     
-    def plot_df_with_dashed_lines(self, df, dashed_series, placeholder):
+    def plot_df_with_dashed_lines(
+            self, 
+            df,
+            placeholder,
+            dashed_series = [
+                "Oplaad punten [kW]",
+                "Utiliteit totaal [kW]",
+                "Woningen totaal [kW]",
+                "Zonnepanelen [kW]"
+            ]
+        ):
         if df is None or df.empty:
             placeholder.write("No data to plot.")
             return

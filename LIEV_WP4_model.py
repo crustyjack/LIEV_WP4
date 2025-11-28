@@ -86,7 +86,8 @@ if st.button("Update plot"):
 plot_placeholder = st.empty()   # <--- optional: ensure placeholder exists early
 
 if st.session_state["df_plot_data"] is not None:
-    plot_placeholder.line_chart(st.session_state["df_plot_data"])
+    #plot_placeholder.line_chart(st.session_state["df_plot_data"])
+    bg.plot_df_with_dashed_lines(st.session_state["df_plot_data"], plot_placeholder)
 else:
     st.write("No plot generated yet.")
 
