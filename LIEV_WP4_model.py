@@ -28,7 +28,7 @@ MSR_name = st.selectbox(
 year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
 
 if st.button("Change date to largest draw through MSR"):
-    None
+    default_start = df_output[f"DATE_{year}"].min().date()
 
 if st.button("Change date to least (or most negative) draw through MSR"):
     None
@@ -78,7 +78,6 @@ min_date = df_output[f"DATE_{year}"].min().date()
 max_date = df_output[f"DATE_{year}"].max().date()
 
 default_start = datetime.now()
-default_end = datetime.now() + timedelta(days=1)
 
 start_date = st.date_input("Start date", min_date, min_value=min_date, max_value=max_date)
 end_date = st.date_input("End date", start_date + timedelta(days=1), min_value=start_date + timedelta(days=1), max_value=max_date)

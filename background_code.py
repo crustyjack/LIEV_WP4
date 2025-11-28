@@ -132,8 +132,8 @@ class BackgroundCode:
         df_slice = df.copy().loc[mask]
 
         # adjuster for amount of CPs in neaightbourhood
-        df_slice["Oplaad punten [kW]"] = df_slice["Oplaad punten [kW]"]*((year-2025)/25)*EV_factor
-        df_slice["MSR totaal [kW]"] = df_slice["Zonnepanelen [kW]"] + df_slice["Oplaad punten [kW]"] + df_slice["Woningen totaal [kW]"] + df_slice["Utiliteit totaal [kW]"]
+        #df_slice["Oplaad punten [kW]"] = df_slice["Oplaad punten [kW]"]*((year-2025)/25)*EV_factor
+        #df_slice["MSR totaal [kW]"] = df_slice["Zonnepanelen [kW]"] + df_slice["Oplaad punten [kW]"] + df_slice["Woningen totaal [kW]"] + df_slice["Utiliteit totaal [kW]"]
         
         # ---- PLOT ----
         st.session_state["df_plot_data"] = df_slice.set_index(f"DATE_{year}")[cols_to_plot]
@@ -167,6 +167,13 @@ class BackgroundCode:
         # Create the new column
         df[f"DATE_{target_year}"] = shifted
         df[f"DATE_{target_year}"] = pd.to_datetime(df[f"DATE_{target_year}"])
+
+        df = self._adjust_EV_profile(df, target_year)
+        return df
+    
+    def _adjust_EV_profile(self, df, target_year, EV_factor=200):
+        df["Oplaad punten [kW]"] = df["Oplaad punten [kW]"]*((target_year-2025)/25)*EV_factor
+        df["MSR totaal [kW]"] = df["Zonnepanelen [kW]"] + df["Oplaad punten [kW]"] + df["Woningen totaal [kW]"] + df["Utiliteit totaal [kW]"]
 
         return df
     
