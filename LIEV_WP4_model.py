@@ -19,15 +19,15 @@ st.write(
 )
 MSR_name = st.selectbox(
     "Which MSR would you like to view the model for?",
-    ("Sporenburg", "Choice 2", "Choice 3"))
+    ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
 
 #print(option)
 
-Accom_elect_perc = st.slider("What percentage of accomodation is fully electric?", 0, 100, 25)
+#Accom_elect_perc = st.slider("What percentage of accomodation is fully electric?", 0, 100, 25)
 
-year = st.slider("What year would you like to model?", 2025, 2050, 2025)
+year = st.slider("What year would you like to model? - For now only varies EV adoption", 2025, 2050, 2025)
 
-st.write("You are modelling ", MSR_name, " MSR", "with an fully electric home adoption rate of ", Accom_elect_perc, "%, in the year ", year, ".")
+#st.write("You are modelling ", MSR_name, " MSR", "with an fully electric home adoption rate of ", Accom_elect_perc, "%, in the year ", year, ".")
 
 
 # Section to load in all dataframes if they are not in cached storage.
@@ -46,6 +46,12 @@ df_profiles = st.session_state.df_profiles
 # Load MSR dataframe only if not already in session_state
 if "df_MSRs" not in st.session_state:
     st.session_state.df_MSRs = bg.get_sheet_dataframe("MSR_summary", sheet)
+
+df_MSRs = st.session_state.df_MSRs
+
+# Load MSR measured dataframe only if not already in session_state
+if "df_MSRs_measured" not in st.session_state:
+    st.session_state.df_MSRs_measured = bg.get_sheet_dataframe("MSR_measured_profiles", sheet)
 
 df_MSRs = st.session_state.df_MSRs
 
@@ -80,7 +86,7 @@ if "df_plot_data" not in st.session_state:
 
 # ---- BUTTON (always above the plot) ----
 if st.button("Update plot"):
-    bg.plot_df(start_date, end_date, df_output, year)
+    bg.prepare_plot_df(start_date, end_date, df_output, year) # not sure what this does
 
 # ---- SHOW PLOT (if exists) ----
 plot_placeholder = st.empty()   # <--- optional: ensure placeholder exists early
@@ -97,47 +103,3 @@ else:
 
 
 # --- TESTING ---
-# The following works - it jsut has to be run through the function bg.plot_df_with_dashed_lines(df, dashed_series, placeholder)
-"""
-df = st.session_state["df_plot_data"]
-
-# Reset index safely
-df_reset = df.reset_index()
-
-# Identify the index column (the column added by reset_index)
-index_col = df_reset.columns[0]   # first column is the former index
-
-df_long = df_reset.melt(
-    id_vars=index_col,
-    var_name="series",
-    value_name="value"
-)
-
-# Example dashed lines
-dashed_series = ["Oplaad punten [kW]",
-                 "Utiliteit totaal [kW]",
-                 "Woningen totaal [kW]",
-                 "Zonnepanelen [kW]"]
-
-chart = (
-    alt.Chart(df_long)
-    .mark_line()
-    .encode(
-        x=index_col + ":T",   # use the detected column
-        y="value:Q",
-        color="series:N",
-        strokeDash=alt.condition(
-            alt.FieldOneOfPredicate(field="series", oneOf=dashed_series),
-            alt.value([4, 4]),
-            alt.value([1, 0])
-        ),
-        strokeWidth=alt.condition(
-            alt.FieldOneOfPredicate(field="series", oneOf=dashed_series),
-            alt.value(1),        # thinner dashed line
-            alt.value(2.5)       # default thickness for solid lines
-        )
-    )
-)
-
-plot_placeholder.altair_chart(chart, use_container_width=True)
-"""

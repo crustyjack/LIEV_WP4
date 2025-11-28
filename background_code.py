@@ -126,13 +126,15 @@ class BackgroundCode:
             df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=day_difference*96)
         return df
 
-    def plot_df(self, start_date, end_date, df, year, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]", "Zonnepanelen [kW]", "Oplaad punten [kW]", "MSR totaal [kW]"]):
+    def prepare_plot_df(self, start_date, end_date, df, year, EV_factor=5, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]", "Zonnepanelen [kW]", "Oplaad punten [kW]", "MSR totaal [kW]"]):
         df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
         mask = (df[f"DATE_{year}"] >= pd.to_datetime(start_date)) & (df[f"DATE_{year}"] <= pd.to_datetime(end_date))
-        df_slice = df.loc[mask]
+        df_slice = df.copy().loc[mask]
 
-        # st.write("Filtered DataFrame", df_slice)
-
+        # adjuster for amount of CPs in neaightbourhood
+        df_slice["Oplaad punten [kW]"] = df_slice["Oplaad punten [kW]"]*((year-2025)/25)*EV_factor
+        df_slice["MSR totaal [kW]"] = df_slice["Zonnepanelen [kW]"] + df_slice["Oplaad punten [kW]"] + df_slice["Woningen totaal [kW]"] + df_slice["Utiliteit totaal [kW]"]
+        
         # ---- PLOT ----
         st.session_state["df_plot_data"] = df_slice.set_index(f"DATE_{year}")[cols_to_plot]
 
@@ -182,6 +184,20 @@ class BackgroundCode:
         if df is None or df.empty:
             placeholder.write("No data to plot.")
             return
+        
+        label_map = {
+            "Oplaad punten [kW]" : "Public charging points",
+            "Utiliteit totaal [kW]": "Utility buildings",
+            "Woningen totaal [kW]": "Accomodation buildings",
+            "Zonnepanelen [kW]": "Solar panels"
+        }
+
+        dashed_series = [
+            "Public charging points",
+            "Utility buildings",
+            "Accomodation buildings",
+            "Solar panels"
+        ]
 
         # Reset index safely
         df_reset = df.reset_index()
@@ -199,14 +215,16 @@ class BackgroundCode:
             value_name="value"
         )
 
+        df_long["series"] = df_long["series"].replace(label_map)
+
         # Build chart
         chart = (
             alt.Chart(df_long)
             .mark_line()
             .encode(
-                x=index_col + ":T",   # Temporal axis (date/time)
-                y="value:Q",
-                color="series:N",
+                x=alt.X(index_col + ":T", title="Date"),   # Temporal axis (date/time)
+                y=alt.Y("value:Q", title="Power [kW]"),
+                color=alt.Color("series:N", title=""),
                 strokeDash=alt.condition(
                     alt.FieldOneOfPredicate(field="series", oneOf=dashed_series),
                     alt.value([4, 4]),       # dashed style
