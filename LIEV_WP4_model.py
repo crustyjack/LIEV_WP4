@@ -25,7 +25,7 @@ MSR_name = st.selectbox(
 
 #Accom_elect_perc = st.slider("What percentage of accomodation is fully electric?", 0, 100, 25)
 
-year = st.slider("What year would you like to model? - For now only varies EV adoption", 2025, 2050, 2025)
+year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
 
 #st.write("You are modelling ", MSR_name, " MSR", "with an fully electric home adoption rate of ", Accom_elect_perc, "%, in the year ", year, ".")
 
