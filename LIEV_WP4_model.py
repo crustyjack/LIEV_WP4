@@ -27,6 +27,10 @@ if "df_profiles" not in st.session_state:
     st.session_state.df_profiles = bg.get_sheet_dataframe("Profiles", sheet)
 
 df_profiles = st.session_state.df_profiles
+df_profiles["DATUM_TIJDSTIP_2024"] = (
+    pd.to_datetime(df_profiles["DATUM_TIJDSTIP_2024"], dayfirst=True, utc=True)
+    .dt.tz_convert(None)
+)
 
 # Load MSR dataframe only if not already in session_state
 if "df_MSRs" not in st.session_state:
@@ -39,8 +43,12 @@ if "df_MSRs_measured" not in st.session_state:
     st.session_state.df_MSRs_measured = bg.get_sheet_dataframe("MSR_measured_profiles", sheet)
 
 df_MSRs_measured = st.session_state.df_MSRs_measured
+df_MSRs_measured["DATUM_TIJDSTIP_2024"] = (
+    pd.to_datetime(df_MSRs_measured["DATUM_TIJDSTIP_2024"], dayfirst=True, utc=True)
+    .dt.tz_convert(None)
+)
 
-df_merged = df_profiles.merge(df_MSRs_measured, on="DATUM_TIJDSTIP_2024", how="left")
+#df_merged = df_profiles.merge(df_MSRs_measured, on="DATUM_TIJDSTIP_2024", how="left")
 
 # --- Create page ---
 st.title("⚡MSR model Amsterdam")
@@ -94,7 +102,7 @@ if "df_plot_data" not in st.session_state:
 
 # ---- BUTTON (always above the plot) ----
 if st.button("Update plot"):
-    bg.prepare_plot_df(start_date, end_date, df_output, year) # not sure what this does
+    bg.prepare_plot_df(start_date, end_date, df_output, year, MSR_name, df_MSRs_measured) # not sure what this does
 
 # ---- SHOW PLOT (if exists) ----
 plot_placeholder = st.empty()   # <--- optional: ensure placeholder exists early
@@ -106,8 +114,7 @@ else:
     st.write("No plot generated yet.")
 
 # ---- DEBUG ----
-#st.write(st.session_state["df_plot_data"])
-st.write(df_merged)
-
+st.write(st.session_state["df_plot_data"])
+#st.write(df_merged)
 
 # --- TESTING ---

@@ -129,20 +129,63 @@ class BackgroundCode:
             df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=day_difference*96)
         return df
 
-    def prepare_plot_df(self, start_date, end_date, df, year, EV_factor=5, cols_to_plot=["Woningen totaal [kW]", "Utiliteit totaal [kW]", "Zonnepanelen [kW]", "Oplaad punten [kW]", "MSR totaal [kW]"]):
-        df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
+    def prepare_plot_df(self, start_date, end_date, df, year, MSR_name, df_MSRs_measured, EV_factor=5):
+        #df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
+
+        df_MSR_measured_specific = df_MSRs_measured[["DATUM_TIJDSTIP_2024", f"MSR: {self._MSR_name_to_ID(MSR_name)} demand [kW]"]].copy()
+        df_profiles = df.copy()
+        df_merged = df_profiles.merge(df_MSR_measured_specific, on="DATUM_TIJDSTIP_2024", how="left")
+
         mask = (df[f"DATE_{year}"] >= pd.to_datetime(start_date)) & (df[f"DATE_{year}"] <= pd.to_datetime(end_date))
-        df_slice = df.copy().loc[mask]
+        
+        df_slice = df_merged.loc[mask]
+
+        # --- add to cols to plot ---
+        cols_to_plot = [
+            "Woningen totaal [kW]",
+            "Utiliteit totaal [kW]",
+            "Zonnepanelen [kW]",
+            "Oplaad punten [kW]",
+            "MSR totaal [kW]",
+        ]
+
+        # Add MSR demand column safely
+        msr_col = f"MSR: {self._MSR_name_to_ID(MSR_name)} demand [kW]"
+        cols_to_plot.append(msr_col)
+
+        #cols_to_plot.append(f"MSR: {self._MSR_name_to_ID(MSR_name)} demand [kW]")
 
         # adjuster for amount of CPs in neaightbourhood
         #df_slice["Oplaad punten [kW]"] = df_slice["Oplaad punten [kW]"]*((year-2025)/25)*EV_factor
         #df_slice["MSR totaal [kW]"] = df_slice["Zonnepanelen [kW]"] + df_slice["Oplaad punten [kW]"] + df_slice["Woningen totaal [kW]"] + df_slice["Utiliteit totaal [kW]"]
         
-        # ---- PLOT ----
+        # --- DEBUGGING ---
+
+        print("YEAR:", year)
+        print("Looking for column:", f"DATE_{year}")
+        print("df_slice columns:", df_slice.columns.tolist())
+        print("cols_to_plot:", cols_to_plot)
+
+
+        # --- store into session_state
         st.session_state["df_plot_data"] = df_slice.set_index(f"DATE_{year}")[cols_to_plot]
 
         #return plot
-    
+    def _MSR_name_to_ID(self, MSR_name):
+        if MSR_name == "Sporenburg":
+            MSR_ID_short = 9020467
+            MSR_ID_long = 1099527115509
+        if MSR_name == "Roelantstraat":
+            MSR_ID_short = 3002917
+            MSR_ID_long = 1099524246697
+        if MSR_name == "Vincent van Goghstraat":
+            MSR_ID_short = 9015800
+            MSR_ID_long = 1099526882871
+
+        return MSR_ID_short #, MSR_ID_long
+
+
+            # Sporenburg", "Roelantstraat", "Vincent van Goghstraat"
     def _mask_maker(self, start_date, end_date, df):
         df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
         mask = (df["DATUM_TIJDSTIP_2024"] >= pd.to_datetime(start_date)) & (df["DATUM_TIJDSTIP_2024"] <= pd.to_datetime(end_date))
