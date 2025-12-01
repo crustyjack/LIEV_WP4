@@ -13,29 +13,9 @@ from datetime import timedelta, datetime
 
 bg = background_code.BackgroundCode()
 
-st.title("⚡MSR model Amsterdam")
-st.write(
-    "We hope this is useful for you."
-)
-MSR_name = st.selectbox(
-    "Which MSR would you like to view the model for?",
-    ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
 
-#print(option)
+# --- Load background data ---
 
-#Accom_elect_perc = st.slider("What percentage of accomodation is fully electric?", 0, 100, 25)
-
-year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
-
-if st.button("Change date to largest draw through MSR"):
-    default_start = df_output[f"DATE_{year}"].min().date()
-
-if st.button("Change date to least (or most negative) draw through MSR"):
-    None
-#st.write("You are modelling ", MSR_name, " MSR", "with an fully electric home adoption rate of ", Accom_elect_perc, "%, in the year ", year, ".")
-
-
-# Section to load in all dataframes if they are not in cached storage.
 # Load sheet only if not already in session_state
 if "sheet" not in st.session_state:
     st.session_state.sheet = bg.load_Gsheets()
@@ -58,28 +38,52 @@ df_MSRs = st.session_state.df_MSRs
 if "df_MSRs_measured" not in st.session_state:
     st.session_state.df_MSRs_measured = bg.get_sheet_dataframe("MSR_measured_profiles", sheet)
 
-df_MSRs = st.session_state.df_MSRs
+df_MSRs_measured = st.session_state.df_MSRs_measured
+
+df_merged = df_profiles.merge(df_MSRs_measured, on="DATUM_TIJDSTIP_2024", how="left")
+
+# --- Create page ---
+st.title("⚡MSR model Amsterdam")
+st.write(
+    "We hope this is useful for you."
+)
+MSR_name = st.selectbox(
+    "Which MSR would you like to view the model for?",
+    ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
+
+#Accom_elect_perc = st.slider("What percentage of accomodation is fully electric?", 0, 100, 25)
+
+year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
 
 df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
-df_output["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_output["DATUM_TIJDSTIP_2024"], dayfirst=True)
 df_output = bg._map_2024_to_year(df_output, year)
-#test = bg.building_type_to_num("Wo", df_MSRs)
-#print(test)
-# hi
 
+if "min_max" not in st.session_state:
+    st.session_state.min_max = "-"
 
-# st.dataframe(df_output)
+if st.button("Change date to largest draw through MSR"):
+    date_max_power = df_output.loc[df_output["MSR totaal [kW]"].idxmax(), (f"DATE_{year}")]
+    st.session_state.date_max_power = date_max_power
+    st.session_state.min_max = "max"
 
-#st.sidebar.header("Date Filter")
-
-
+if st.button("Change date to least (or most negative) draw through MSR"):
+    date_min_power = df_output.loc[df_output["MSR totaal [kW]"].idxmin(), (f"DATE_{year}")]
+    st.session_state.date_min_power = date_min_power
+    st.session_state.min_max = "min"
+#st.write("You are modelling ", MSR_name, " MSR", "with an fully electric home adoption rate of ", Accom_elect_perc, "%, in the year ", year, ".")
 
 min_date = df_output[f"DATE_{year}"].min().date()
 max_date = df_output[f"DATE_{year}"].max().date()
 
-default_start = datetime.now()
+default_start = min_date
 
-start_date = st.date_input("Start date", min_date, min_value=min_date, max_value=max_date)
+if "min_max" in st.session_state:
+    if st.session_state.min_max == "max" and "date_max_power" in st.session_state:
+        default_start = st.session_state.date_max_power
+    elif st.session_state.min_max == "min" and "date_min_power" in st.session_state:
+        default_start = st.session_state.date_min_power
+
+start_date = st.date_input("Start date", default_start, min_value=min_date, max_value=max_date)
 end_date = st.date_input("End date", start_date + timedelta(days=1), min_value=start_date + timedelta(days=1), max_value=max_date)
 
 plot_placeholder = st.empty()   # chart will appear BELOW this
@@ -103,7 +107,7 @@ else:
 
 # ---- DEBUG ----
 #st.write(st.session_state["df_plot_data"])
-#st.write(df_output)
+st.write(df_merged)
 
 
 # --- TESTING ---

@@ -65,6 +65,9 @@ class BackgroundCode:
         df_MSR_profile["Woningen totaal [kW]"] = df_MSR_profile["Woning [kW]"] + df_MSR_profile["Appartement [kW]"]
         df_MSR_profile["Utiliteit totaal [kW]"] = df_MSR_profile["Winkel [kW]"] + df_MSR_profile["Onderwijs [kW]"] + df_MSR_profile["Kantoor [kW]"] + df_MSR_profile["Gezondsheid [kW]"] + df_MSR_profile["Industrie [kW]"] + df_MSR_profile["Overig [kW]"] + df_MSR_profile["Logies [kW]"] + df_MSR_profile["Bijenkomst [kW]"] + df_MSR_profile["Sport [kW]"]
         df_MSR_profile["MSR totaal [kW]"] = df_MSR_profile["Zonnepanelen [kW]"] + df_MSR_profile["Oplaad punten [kW]"] + df_MSR_profile["Woningen totaal [kW]"] + df_MSR_profile["Utiliteit totaal [kW]"]
+
+        df_MSR_profile["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df_MSR_profile["DATUM_TIJDSTIP_2024"], dayfirst=True)
+
         return df_MSR_profile
     
     def building_type_to_num(self, letter, df_MSRs):
@@ -213,7 +216,7 @@ class BackgroundCode:
         index_col = df_reset.columns[0]
 
         # Ensure datetime index is treated correctly
-        df_reset[index_col] = pd.to_datetime(df_reset[index_col], errors="ignore")
+        df_reset[index_col] = pd.to_datetime(df_reset[index_col])
 
         # Convert to long format
         df_long = df_reset.melt(
@@ -246,7 +249,7 @@ class BackgroundCode:
         )
 
         # Render chart
-        placeholder.altair_chart(chart, use_container_width=True)
+        placeholder.altair_chart(chart, width='stretch')
 
 if __name__ == "__main__":
     main()
