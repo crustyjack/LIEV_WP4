@@ -48,8 +48,6 @@ df_MSRs_measured["DATUM_TIJDSTIP_2024"] = (
     .dt.tz_convert(None)
 )
 
-#df_merged = df_profiles.merge(df_MSRs_measured, on="DATUM_TIJDSTIP_2024", how="left")
-
 # --- Create page ---
 st.title("⚡MSR model Amsterdam")
 st.write(
