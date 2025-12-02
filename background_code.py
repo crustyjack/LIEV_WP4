@@ -129,14 +129,14 @@ class BackgroundCode:
             df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=day_difference*96)
         return df
 
-    def prepare_plot_df(self, start_date, end_date, df, year, MSR_name, df_MSRs_measured, EV_factor=5):
+    def prepare_plot_df(self, start_date, end_date, df, MSR_name, df_MSRs_measured, EV_factor=5):
         #df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
 
         df_MSR_measured_specific = df_MSRs_measured[["DATUM_TIJDSTIP_2024", f"MSR: {self._MSR_name_to_ID(MSR_name)} demand [kW]"]].copy()
         df_profiles = df.copy()
         df_merged = df_profiles.merge(df_MSR_measured_specific, on="DATUM_TIJDSTIP_2024", how="left")
 
-        mask = (df[f"DATE_{year}"] >= pd.to_datetime(start_date)) & (df[f"DATE_{year}"] <= pd.to_datetime(end_date))
+        mask = (df["DATUM_TIJDSTIP_2024"] >= pd.to_datetime(start_date)) & (df["DATUM_TIJDSTIP_2024"] <= pd.to_datetime(end_date))
         
         df_slice = df_merged.loc[mask]
 
@@ -160,7 +160,7 @@ class BackgroundCode:
         #df_slice["MSR totaal [kW]"] = df_slice["Zonnepanelen [kW]"] + df_slice["Oplaad punten [kW]"] + df_slice["Woningen totaal [kW]"] + df_slice["Utiliteit totaal [kW]"]
         
         # --- store into session_state
-        st.session_state["df_plot_data"] = df_slice.set_index(f"DATE_{year}")[cols_to_plot]
+        st.session_state["df_plot_data"] = df_slice.set_index("DATUM_TIJDSTIP_2024")[cols_to_plot]
 
         #return plot
     def _MSR_name_to_ID(self, MSR_name):
@@ -209,8 +209,8 @@ class BackgroundCode:
         df = self._adjust_EV_profile(df, target_year)
         return df
     
-    def _adjust_EV_profile(self, df, target_year, EV_factor=200):
-        df["Oplaad punten [kW]"] = df["Oplaad punten [kW]"]*((target_year-2025)/25)*EV_factor
+    def adjust_EV_profile(self, df, EV_adoption_rate, EV_factor=5):
+        df["Oplaad punten [kW]"] = df["Oplaad punten [kW]"]*((EV_adoption_rate-10)/90)*EV_factor
         df["MSR totaal [kW]"] = df["Zonnepanelen [kW]"] + df["Oplaad punten [kW]"] + df["Woningen totaal [kW]"] + df["Utiliteit totaal [kW]"]
 
         return df
