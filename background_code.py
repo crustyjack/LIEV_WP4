@@ -159,14 +159,6 @@ class BackgroundCode:
         #df_slice["Oplaad punten [kW]"] = df_slice["Oplaad punten [kW]"]*((year-2025)/25)*EV_factor
         #df_slice["MSR totaal [kW]"] = df_slice["Zonnepanelen [kW]"] + df_slice["Oplaad punten [kW]"] + df_slice["Woningen totaal [kW]"] + df_slice["Utiliteit totaal [kW]"]
         
-        # --- DEBUGGING ---
-
-        print("YEAR:", year)
-        print("Looking for column:", f"DATE_{year}")
-        print("df_slice columns:", df_slice.columns.tolist())
-        print("cols_to_plot:", cols_to_plot)
-
-
         # --- store into session_state
         st.session_state["df_plot_data"] = df_slice.set_index(f"DATE_{year}")[cols_to_plot]
 

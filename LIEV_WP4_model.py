@@ -63,6 +63,8 @@ MSR_name = st.selectbox(
 
 year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
 
+#EV_adoption_perc = st.slider("What percentage of EV adoption would you like to model?", 10, 100, 10)
+
 df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
 df_output = bg._map_2024_to_year(df_output, year)
 
@@ -90,6 +92,14 @@ if "min_max" in st.session_state:
         default_start = st.session_state.date_max_power
     elif st.session_state.min_max == "min" and "date_min_power" in st.session_state:
         default_start = st.session_state.date_min_power
+
+if isinstance(default_start, pd.Timestamp):
+    default_start = default_start.date()
+
+default_start = min(max(default_start, min_date), max_date)
+
+print("Hello!!!!!!!!!", type(default_start), type(min_date), type(max_date))
+print(default_start)
 
 start_date = st.date_input("Start date", default_start, min_value=min_date, max_value=max_date)
 end_date = st.date_input("End date", start_date + timedelta(days=1), min_value=start_date + timedelta(days=1), max_value=max_date)
