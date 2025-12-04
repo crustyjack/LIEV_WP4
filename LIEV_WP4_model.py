@@ -146,6 +146,9 @@ if st.session_state["df_plot_data"] is not None:
 else:
     st.write("No plot generated yet.")
 
+HvA_logo_url = "https://lectorenplatformleve.nl/wp-content/uploads/2021/11/HvA.jpg"
+st.image(bg.image_converter(HvA_logo_url, 255, 255, 255, 255, 200))
+
 # ---- DEBUG ----
 #st.write(st.session_state["df_plot_data"])
 #st.write(df_merged)

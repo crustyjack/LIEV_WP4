@@ -2,6 +2,7 @@
 # Last update: 24/11/2025
 
 import gspread
+import requests
 
 import streamlit as st
 import pandas as pd
@@ -11,6 +12,8 @@ import altair as alt
 
 from google.oauth2.service_account import Credentials
 from datetime import timedelta
+from PIL import Image
+from io import BytesIO
 
 class BackgroundCode:
 
@@ -281,10 +284,29 @@ class BackgroundCode:
                     alt.value(2.5)           # thicker solid lines
                 )
             )
+            .properties(
+                padding={"bottom": 40}         # add 40px bottom margin
+            )
         )
 
         # Render chart
         placeholder.altair_chart(chart, width='stretch')
+    
+    # --- Image function set up ---
+    def image_converter(self, URL, R, G, B, A, width=None):
+        response = requests.get(URL)
+        image = Image.open(BytesIO(response.content)).convert("RGBA")
+        background = Image.new("RGBA", image.size, (R, G, B, A))
+        background.paste(image, (0,0), image)
+        final_image = background.convert("RGB")
+
+        if width:
+            w, h = final_image.size
+            ratio = width / w
+            new_height = int(h * ratio)
+            final_image = final_image.resize((width, new_height), Image.LANCZOS)
+
+        return final_image
 
 if __name__ == "__main__":
     main()
