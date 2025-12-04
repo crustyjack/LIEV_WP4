@@ -62,7 +62,7 @@ MSR_name = st.selectbox(
 #year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
 
 EV_adoption_perc = st.slider("What percentage of EV adoption would you like to model?", 10, 100, 10)
-WP_adoption_perc = st.slider("What percentage of electrical heat pump adoption would you like to model?", 10, 100, 10)
+#WP_adoption_perc = st.slider("What percentage of electrical heat pump adoption would you like to model?", 10, 100, 10)
 
 df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
 df_output = bg.adjust_EV_profile(df_output, EV_adoption_perc, EV_factor=5)
