@@ -49,7 +49,7 @@ df_MSRs_measured["DATUM_TIJDSTIP_2024"] = (
 )
 
 # --- Create page ---
-st.title("⚡MSR model Amsterdam")
+st.title("⚡Medium voltage station (MSR) model Amsterdam")
 st.write(
     "We hope this is useful for you."
 )
