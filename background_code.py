@@ -132,7 +132,7 @@ class BackgroundCode:
             df[f"Pseudo year {year}"] = np.roll(df[f"Pseudo year {year}"], shift=day_difference*96)
         return df
 
-    def prepare_plot_df(self, start_date, end_date, df, MSR_name, df_MSRs_measured, EV_factor=5):
+    def prepare_plot_df(self, start_date, end_date, df, MSR_name, df_MSRs_measured):
         #df["DATUM_TIJDSTIP_2024"] = pd.to_datetime(df["DATUM_TIJDSTIP_2024"])
 
         df_MSR_measured_specific = df_MSRs_measured[["DATUM_TIJDSTIP_2024", f"MSR: {self._MSR_name_to_ID(MSR_name)} demand [kW]"]].copy()
@@ -218,6 +218,29 @@ class BackgroundCode:
 
         return df
     
+    def update_charge_strat(self, df, charge_strat, df_profiles, df_MSRs, MSR_name):
+        charge_profile_name = self.charge_profile_lookup(charge_strat)
+        df["Oplaad punten [kW]"] = df_profiles[charge_profile_name].copy()*df_MSRs[MSR_name][self.building_type_to_num("CP", df_MSRs)]*12670*4 
+        df["MSR totaal [kW]"] = df["Zonnepanelen [kW]"] + df["Oplaad punten [kW]"] + df["Woningen totaal [kW]"] + df["Utiliteit totaal [kW]"]
+
+        return df
+    
+    def charge_profile_lookup(self, charge_strat):
+        
+        if charge_strat == "Regular on-demand charging":
+            prof_name = "Charge point energy_normalised [kWh/kWh]"
+        
+        if charge_strat == "Grid-aware smart charging":
+            prof_name = "Elaad_net_bewust_norm. [kWh/kWh]"
+
+        if charge_strat == "Capacity pooling":
+            prof_name = "Elaad_cap_pooling_norm. [kWh/kWh]"
+
+        if charge_strat == "V2G":
+            prof_name = "Elaad_V2G_norm. [kWh/kWh]"
+
+        return prof_name
+
     def plot_df_with_dashed_lines(
             self, 
             df,

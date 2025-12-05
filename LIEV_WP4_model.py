@@ -57,6 +57,10 @@ MSR_name = st.selectbox(
     "Which MSR would you like to view the model for?",
     ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
 
+charge_strat = st.selectbox(
+    "Which charging strategy would you like to apply?",
+    ("Regular on-demand charging", "Grid-aware smart charging", "Capacity pooling", "V2G"))
+
 #Accom_elect_perc = st.slider("What percentage of accomodation is fully electric?", 0, 100, 25)
 
 #year = st.slider("What year would you like to model? - For now only impacts EV adoption", 2025, 2050, 2025)
@@ -65,7 +69,9 @@ EV_adoption_perc = st.slider("What percentage of EV adoption would you like to m
 #WP_adoption_perc = st.slider("What percentage of electrical heat pump adoption would you like to model?", 10, 100, 10)
 
 df_output = bg.profile_creator(df_profiles, df_MSRs, MSR_name)
+df_output = bg.update_charge_strat(df_output, charge_strat, df_profiles, df_MSRs, MSR_name)
 df_output = bg.adjust_EV_profile(df_output, EV_adoption_perc, EV_factor=5)
+
 #df_output = bg._map_2024_to_year(df_output, year)
 
 if "min_max" not in st.session_state:
@@ -154,3 +160,7 @@ st.image(bg.image_converter(HvA_logo_url, 255, 255, 255, 255, 200))
 #st.write(df_merged)
 
 # --- TESTING ---
+
+
+# --- Useful ---
+# streamlit run LIEV_WP4_model.py
