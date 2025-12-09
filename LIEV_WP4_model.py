@@ -57,6 +57,10 @@ MSR_name = st.selectbox(
     "Which MSR would you like to view the model for?",
     ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
 
+st.image(bg.MSR_image_display(MSR_name))
+
+# image displayer Vincent van Goghstraat https://ibb.co/KzW65X6M
+
 charge_strat = st.selectbox(
     "Which charging strategy would you like to apply?",
     ("Regular on-demand charging", "Grid-aware smart charging", "Capacity pooling", "V2G"))

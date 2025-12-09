@@ -330,6 +330,32 @@ class BackgroundCode:
             final_image = final_image.resize((width, new_height), Image.LANCZOS)
 
         return final_image
+    
+    def image_loader(self, URL, width=None):
+        response = requests.get(URL)
+        image = Image.open(BytesIO(response.content)).convert("RGBA")
+
+        if width:
+            w, h = image.size
+            ratio = width / w
+            new_height = int(h * ratio)
+            image = image.resize((width, new_height), Image.LANCZOS)
+        
+        return image
+    
+    def MSR_image_display(self, MSR_name):
+        if MSR_name == "Sporenburg":
+            image_URL = "https://i.ibb.co/bjWzTp9K/Sporenburg.png"
+        elif MSR_name == "Roelantstraat":
+            image_URL = "https://i.ibb.co/v6tmHYWN/Roelantstraat.png"
+        elif MSR_name == "Vincent van Goghstraat":
+            image_URL = "https://i.ibb.co/zHZsmrsy/Vincent-van-Goghstraat.png"
+        else:
+            return NameError
+        
+        loaded_image = self.image_loader(image_URL)
+
+        return loaded_image
 
 if __name__ == "__main__":
     main()
