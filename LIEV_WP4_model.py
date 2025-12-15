@@ -79,12 +79,12 @@ df_output = bg.adjust_EV_profile(df_output, EV_adoption_perc, EV_factor=5)
 if "min_max" not in st.session_state:
     st.session_state.min_max = "-"
 
-if st.button("Change date to largest draw through MVS"):
+if st.button("Change date to day with highest peak load"):
     date_max_power = df_output.loc[df_output["MSR totaal [kW]"].idxmax(), ("DATUM_TIJDSTIP_2024")]
     st.session_state.date_max_power = date_max_power
     st.session_state.min_max = "max"
 
-if st.button("Change date to least (or most negative) draw through MVS"):
+if st.button("Change date to day with least (or most negative) peak load"):
     date_min_power = df_output.loc[df_output["MSR totaal [kW]"].idxmin(), ("DATUM_TIJDSTIP_2024")]
     st.session_state.date_min_power = date_min_power
     st.session_state.min_max = "min"

@@ -345,11 +345,11 @@ class BackgroundCode:
     
     def MSR_image_display(self, MSR_name):
         if MSR_name == "Sporenburg":
-            image_URL = "https://i.ibb.co/bjWzTp9K/Sporenburg.png"
+            image_URL = "https://i.ibb.co/1Yfw7ykD/Sporenburg2.png"
         elif MSR_name == "Roelantstraat":
-            image_URL = "https://i.ibb.co/v6tmHYWN/Roelantstraat.png"
+            image_URL = "https://i.ibb.co/qftx93b/Roelantstraat2.png"
         elif MSR_name == "Vincent van Goghstraat":
-            image_URL = "https://i.ibb.co/zHZsmrsy/Vincent-van-Goghstraat.png"
+            image_URL = "https://i.ibb.co/DfnCL6bq/Vincent-van-Goghstraat2.png"
         else:
             return NameError
         
