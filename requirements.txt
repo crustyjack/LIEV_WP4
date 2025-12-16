@@ -4,3 +4,4 @@ pandas
 matplotlib
 altair
 folium
+streamlit_folium
