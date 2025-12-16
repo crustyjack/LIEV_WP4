@@ -51,14 +51,17 @@ df_MSRs_measured["DATUM_TIJDSTIP_2024"] = (
 
 # --- Create page ---
 st.title("⚡Medium voltage station (MSR) model Amsterdam")
-st.write(
-    "We hope this is useful for you."
-)
-MSR_name = st.selectbox(
-    "Which MSR would you like to view the model for?",
-    ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
+st.write("Please select one of the MSRs from the map below")
 
-map_data = st_folium(bg.map_selector(), use_container_width=True)
+#MSR_name = st.selectbox(
+#    "Which MSR would you like to view the model for?",
+#    ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
+
+map_data = st_folium(bg.map_creator(), use_container_width=True)
+
+MSR_name = bg.MSR_from_map(map_data)
+
+st.write("Modelled buildings, solar panels and charging points connected to selected MSR")
 
 st.image(bg.MSR_image_display(MSR_name))
 

@@ -19,9 +19,11 @@ from io import BytesIO
 class BackgroundCode:
 
     def __init__(self):
-        # to be completed
-        
-        pass
+        self.locations = {
+            "Sporenburg": (52.373815, 4.945598),
+            "Roelantstraat": (52.376836, 4.856632),
+            "Vincent van Goghstraat": (52.349022, 4.888944),
+        }
     
     def load_Gsheets(self, Gsheet_ID="1Hc45UijRaTwziEYwK2mXAWz4KTwWoOatef77_K4mSHg"):
         # Load service account info securely from Streamlit secrets
@@ -358,17 +360,11 @@ class BackgroundCode:
 
         return loaded_image
     
-    def map_selector(self):
-        locations = {
-            "Sporenburg": (52.373815, 4.945598),
-            "Roelantstraat": (52.376836, 4.856632),
-            "Vincent van Goghstraat": (52.349022, 4.888944),
-        }
-
+    def map_creator(self):
         m = folium.Map(location=[52.38, 4.9], zoom_start=12)
 
         # Add markers
-        for name, (lat, lon) in locations.items():
+        for name, (lat, lon) in self.locations.items():
             folium.Marker(
                 location=[lat, lon],
                 tooltip=name,
@@ -377,6 +373,23 @@ class BackgroundCode:
             ).add_to(m)
         
         return m
+
+    def MSR_from_map(self, map_data):
+        if map_data and map_data.get("last_object_clicked"):
+            lat = map_data["last_object_clicked"]["lat"]
+            lon = map_data["last_object_clicked"]["lng"]
+
+            selected_location = None
+            for name, (l_lat, l_lon) in self.locations.items():
+                if abs(lat - l_lat) < 0.001 and abs(lon - l_lon) < 0.001:
+                    selected_location = name
+
+            if selected_location:
+                #st.success(f"Selected location: **{selected_location}**")
+                return selected_location
+            else:
+                print("Error selecting MSR on map")
+                return "Sporenburg"
 
 if __name__ == "__main__":
     main()
