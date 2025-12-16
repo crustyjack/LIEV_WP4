@@ -3,6 +3,7 @@
 
 import gspread
 import requests
+import folium
 
 import streamlit as st
 import pandas as pd
@@ -356,6 +357,26 @@ class BackgroundCode:
         loaded_image = self.image_loader(image_URL)
 
         return loaded_image
+    
+    def map_selector(self):
+        locations = {
+            "Sporenburg": (52.373815, 4.945598),
+            "Roelantstraat": (52.376836, 4.856632),
+            "Vincent van Goghstraat": (52.349022, 4.888944),
+        }
+
+        m = folium.Map(location=[52.38, 4.9], zoom_start=12)
+
+        # Add markers
+        for name, (lat, lon) in locations.items():
+            folium.Marker(
+                location=[lat, lon],
+                tooltip=name,
+                popup=name,
+                icon=folium.Icon(icon="info-sign"),
+            ).add_to(m)
+        
+        return m
 
 if __name__ == "__main__":
     main()

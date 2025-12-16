@@ -10,6 +10,7 @@ import altair as alt
 
 from google.oauth2.service_account import Credentials
 from datetime import timedelta, datetime
+from streamlit_folium import st_folium
 
 bg = background_code.BackgroundCode()
 
@@ -56,6 +57,8 @@ st.write(
 MSR_name = st.selectbox(
     "Which MSR would you like to view the model for?",
     ("Sporenburg", "Roelantstraat", "Vincent van Goghstraat"))
+
+map_data = st_folium(bg.map_selector(), use_container_width=True)
 
 st.image(bg.MSR_image_display(MSR_name))
 
