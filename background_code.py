@@ -390,6 +390,8 @@ class BackgroundCode:
             else:
                 print("Error selecting MSR on map")
                 return "Sporenburg"
+        else:
+            return "Sporenburg"
 
 if __name__ == "__main__":
     main()

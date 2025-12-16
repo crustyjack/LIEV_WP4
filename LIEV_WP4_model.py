@@ -14,7 +14,6 @@ from streamlit_folium import st_folium
 
 bg = background_code.BackgroundCode()
 
-
 # --- Load background data ---
 
 # Load sheet only if not already in session_state
